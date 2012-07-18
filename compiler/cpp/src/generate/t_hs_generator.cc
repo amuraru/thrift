@@ -899,16 +899,6 @@ void t_hs_generator::generate_service_client(t_service* tservice) {
       indent(f_client_) << "res <- read_" << resultname << " ip" << endl;
       indent(f_client_) << "readMessageEnd ip" << endl;
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        indent(f_client_) << "case f_" << resultname << "_success res of" << endl;
-        indent_up();
-
-        indent(f_client_) << "Just v -> return v" << endl;
-        indent(f_client_) << "Nothing -> do" << endl;
-        indent_up();
-      }
-
       vector<t_field*>::const_iterator x_iter;
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
         string xname = (*x_iter)->get_name();
@@ -918,6 +908,16 @@ void t_hs_generator::generate_service_client(t_service* tservice) {
         indent(f_client_) << "Nothing -> return ()" << endl;
         indent(f_client_) << "Just _v -> throw _v" << endl;
         indent_down();
+      }
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        indent(f_client_) << "case f_" << resultname << "_success res of" << endl;
+        indent_up();
+
+        indent(f_client_) << "Just v -> return v" << endl;
+        indent(f_client_) << "Nothing -> do" << endl;
+        indent_up();
       }
 
       // Careful, only return _result if not a void function

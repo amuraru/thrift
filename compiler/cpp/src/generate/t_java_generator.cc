@@ -2364,14 +2364,6 @@ void t_java_generator::generate_service_client(t_service* tservice) {
         indent() << resultname << " result = new " << resultname << "();" << endl <<
         indent() << "receiveBase(result, \"" << funname << "\");" << endl;
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        f_service_ <<
-          indent() << "if (result." << generate_isset_check("success") << ") {" << endl <<
-          indent() << "  return result.success;" << endl <<
-          indent() << "}" << endl;
-      }
-
       t_struct* xs = (*f_iter)->get_xceptions();
       const std::vector<t_field*>& xceptions = xs->get_members();
       vector<t_field*>::const_iterator x_iter;
@@ -2379,6 +2371,14 @@ void t_java_generator::generate_service_client(t_service* tservice) {
         f_service_ <<
           indent() << "if (result." << (*x_iter)->get_name() << " != null) {" << endl <<
           indent() << "  throw result." << (*x_iter)->get_name() << ";" << endl <<
+          indent() << "}" << endl;
+      }
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        f_service_ <<
+          indent() << "if (result." << generate_isset_check("success") << ") {" << endl <<
+          indent() << "  return result.success;" << endl <<
           indent() << "}" << endl;
       }
 

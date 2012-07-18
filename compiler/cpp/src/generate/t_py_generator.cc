@@ -1338,19 +1338,6 @@ void t_py_generator::generate_service_client(t_service* tservice) {
           indent() << "self._iprot.readMessageEnd()" << endl;
       }
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        f_service_ <<
-          indent() << "if result.success is not None:" << endl;
-          if (gen_twisted_) {
-            f_service_ <<
-              indent() << "  return d.callback(result.success)" << endl;
-          } else {
-            f_service_ <<
-              indent() << "  return result.success" << endl;
-          }
-      }
-
       t_struct* xs = (*f_iter)->get_xceptions();
       const std::vector<t_field*>& xceptions = xs->get_members();
       vector<t_field*>::const_iterator x_iter;
@@ -1364,6 +1351,19 @@ void t_py_generator::generate_service_client(t_service* tservice) {
           } else {
             f_service_ <<
               indent() << "  raise result." << (*x_iter)->get_name() << "" << endl;
+          }
+      }
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        f_service_ <<
+          indent() << "if result.success is not None:" << endl;
+          if (gen_twisted_) {
+            f_service_ <<
+              indent() << "  return d.callback(result.success)" << endl;
+          } else {
+            f_service_ <<
+              indent() << "  return result.success" << endl;
           }
       }
 

@@ -1575,12 +1575,6 @@ void t_go_generator::generate_service_client(t_service* tservice) {
         indent() << "err = " << result << ".Read(iprot)" << endl <<
         indent() << "iprot.ReadMessageEnd()" << endl;
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        f_service_ <<
-          indent() << "value = " << result << ".Success" << endl;
-      }
-      
       t_struct* xs = (*f_iter)->get_xceptions();
       const std::vector<t_field*>& xceptions = xs->get_members();
       vector<t_field*>::const_iterator x_iter;
@@ -1590,7 +1584,13 @@ void t_go_generator::generate_service_client(t_service* tservice) {
           indent() << "  " << (*x_iter)->get_name() << " = " << result << "." << publicize((*x_iter)->get_name()) << endl <<
           indent() << "}" << endl;
       }
-      
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        f_service_ <<
+          indent() << "value = " << result << ".Success" << endl;
+      }
+
       f_service_ <<
         indent() << "return" << endl;
       // Close function

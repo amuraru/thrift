@@ -864,12 +864,6 @@ void t_rb_generator::generate_service_client(t_service* tservice) {
       f_service_ <<
         indent() << "result = receive_message(" << resultname << ")" << endl;
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        f_service_ <<
-          indent() << "return result.success unless result.success.nil?" << endl;
-      }
-
       t_struct* xs = (*f_iter)->get_xceptions();
       const std::vector<t_field*>& xceptions = xs->get_members();
       vector<t_field*>::const_iterator x_iter;
@@ -877,6 +871,12 @@ void t_rb_generator::generate_service_client(t_service* tservice) {
         indent(f_service_) <<
           "raise result." << (*x_iter)->get_name() <<
             " unless result." << (*x_iter)->get_name() << ".nil?" << endl;
+      }
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        f_service_ <<
+          indent() << "return result.success unless result.success.nil?" << endl;
       }
 
       // Careful, only return _result if not a void function

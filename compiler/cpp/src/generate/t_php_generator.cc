@@ -1625,14 +1625,6 @@ void t_php_generator::_generate_service_client(ofstream& out, t_service* tservic
 
       scope_down(out);
 
-      // Careful, only return result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        out <<
-          indent() << "if ($result->success !== null) {" << endl <<
-          indent() << "  return $result->success;" << endl <<
-          indent() << "}" << endl;
-      }
-
       t_struct* xs = (*f_iter)->get_xceptions();
       const std::vector<t_field*>& xceptions = xs->get_members();
       vector<t_field*>::const_iterator x_iter;
@@ -1640,6 +1632,14 @@ void t_php_generator::_generate_service_client(ofstream& out, t_service* tservic
         out <<
           indent() << "if ($result->" << (*x_iter)->get_name() << " !== null) {" << endl <<
           indent() << "  throw $result->" << (*x_iter)->get_name() << ";" << endl <<
+          indent() << "}" << endl;
+      }
+
+      // Careful, only return result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        out <<
+          indent() << "if ($result->success !== null) {" << endl <<
+          indent() << "  return $result->success;" << endl <<
           indent() << "}" << endl;
       }
 

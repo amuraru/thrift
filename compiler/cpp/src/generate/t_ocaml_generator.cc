@@ -1159,19 +1159,18 @@ void t_ocaml_generator::generate_service_client(t_service* tservice) {
       f_service_ <<
         indent() << "iprot#readMessageEnd;" << endl;
 
-      // Careful, only return _result if not a void function
-      if (!(*f_iter)->get_returntype()->is_void()) {
-        f_service_ <<
-          indent() << "match result#get_success with Some v -> v | None -> (" << endl;
-        indent_up();
-      }
-
-
       vector<t_field*>::const_iterator x_iter;
       for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
         f_service_ <<
           indent() << "(match result#get_" << (*x_iter)->get_name() << " with None -> () | Some _v ->" << endl;
         indent(f_service_) << "  raise (" << capitalize(type_name((*x_iter)->get_type())) << " _v));" << endl;
+      }
+
+      // Careful, only return _result if not a void function
+      if (!(*f_iter)->get_returntype()->is_void()) {
+        f_service_ <<
+          indent() << "match result#get_success with Some v -> v | None -> (" << endl;
+        indent_up();
       }
 
       // Careful, only return _result if not a void function

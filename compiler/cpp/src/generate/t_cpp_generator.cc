@@ -2478,6 +2478,22 @@ void t_cpp_generator::generate_service_client(t_service* tservice, string style)
           indent() << _this << "iprot_->getTransport()->readEnd();" << endl <<
           endl;
 
+        t_struct* xs = (*f_iter)->get_xceptions();
+        const std::vector<t_field*>& xceptions = xs->get_members();
+        vector<t_field*>::const_iterator x_iter;
+        for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
+          out <<
+            indent() << "if (result.__isset." << (*x_iter)->get_name() << ") {" << endl;
+          if (style == "Cob" && !gen_no_client_completion_) {
+            out <<
+              indent() << "  completed = true;" << endl <<
+              indent() << "  completed__(true);" << endl;
+          }
+          out  <<
+            indent() << "  throw result." << (*x_iter)->get_name() << ";" << endl <<
+            indent() << "}" << endl;
+        }
+
         // Careful, only look for _result if not a void function
         if (!(*f_iter)->get_returntype()->is_void()) {
           if (is_complex_type((*f_iter)->get_returntype())) {
@@ -2504,22 +2520,6 @@ void t_cpp_generator::generate_service_client(t_service* tservice, string style)
               indent() << "  return _return;" << endl <<
               indent() << "}" << endl;
           }
-        }
-
-        t_struct* xs = (*f_iter)->get_xceptions();
-        const std::vector<t_field*>& xceptions = xs->get_members();
-        vector<t_field*>::const_iterator x_iter;
-        for (x_iter = xceptions.begin(); x_iter != xceptions.end(); ++x_iter) {
-          out <<
-            indent() << "if (result.__isset." << (*x_iter)->get_name() << ") {" << endl;
-          if (style == "Cob" && !gen_no_client_completion_) {
-            out <<
-              indent() << "  completed = true;" << endl <<
-              indent() << "  completed__(true);" << endl;
-          }
-          out  <<
-            indent() << "  throw result." << (*x_iter)->get_name() << ";" << endl <<
-            indent() << "}" << endl;
         }
 
         // We only get here if we are a void function
